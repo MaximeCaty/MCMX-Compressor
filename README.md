@@ -80,7 +80,9 @@ Options:
 Exemple:
 
 Compress : ```mcmx -z -threads 2 inputfile.bin outputfile.mcmx```
+
 Compress with specific memory allocation : ```mcmx -z11 -threads 2 inputfile.bin outputfile.mcmx```
+
 Decompress : ```mcmx d -threads 2 outputfile.mcmx outputfile.decompressed```
 
 If no level is passed, MCMX selects one automatically based on file size and available RAM.

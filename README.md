@@ -56,12 +56,20 @@ Test run on TAR containing 150 MB of binaries
 | Compressor                | Size KB | RAM Peak | Compr. MS | Decomp. MS | VS Libbsc |
 |---------------------------|---------|----------|-----------|------------|---------------------------|
 | libbsc 3.3.12 -e2 -b200   | 13 782  | 505 MB   | 1473      | 1000       |                           |
-| MCM 0.83 -m7              | 10 837  | 558 MB   | 13500     | 13092      | -21.3%                    |
+| MCM 0.84 -m7              | 10 837  | 558 MB   | 13500     | 13092      | -21.3%                    |
 | MCMX 0.85 -m7             | 10 837  | 559 MB   | 12000     | 13239      | -21.3%                    |
 | MCMX 0.85 -m7  -threads 2 | 10 907  | 832 MB   | **6750**      | **6928**       | -20.8%                    |
 | MCMX 0.85 -z7 -threads 2  | 11 895  | 690 MB   | **4570**      | **4854**       | -15.8%                    |
 
+Enwik8
 
+| Compressor                | Size KB | RAM Peak | Compr. MS | Decomp. MS | VS Base line |
+|---------------------------|---------|----------|-----------|------------|--------------|
+| libbsc 3.3.12 -e2 -b200   | 20300   | 488 MB   | 1531      | 938        |              |
+| MCM 0.84 -m7              | 17950   | 428 MB   | 18700     | 18541      | -11.5%       |
+| MCMX 0.85 -m7             | 17950   | 429 MB   | 19400     | 18832      | -11.5%       |
+| MCMX 0.85 -m7  -threads 2 | 18425   | 874 MB   | 11000     | 9680       | -9.2%        |
+| MCMX 0.85 -z7 -threads 2  | 18425   | 860 MB   | **7920**      | **9640**       | -9.2%        |
 
 At the fastest levels (`-z` / `-t`) with 2 or more threads, MCMX approaches libbsc in throughput while maintaining a higher compression ratio in many scenario, especialy on structured data.
 

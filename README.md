@@ -71,7 +71,7 @@ Enwik8
 | MCMX 0.85 -m7  -threads 2 | 18425   | 874 MB   | 11000     | 9680       | -9.2%        |
 | MCMX 0.85 -z7 -threads 2  | 18425   | 860 MB   | **7920**      | **9640**       | -9.2%        |
 
-At the fastest levels (`-z` / `-t`) with 2 or more threads, MCMX approaches libbsc in throughput while maintaining a higher compression ratio in many scenario, especialy on structured data.
+At the fastest levels (`-z` / `-t`) with 2 or more threads, MCMX still beat libbsc in many scenarion while beeing 2-3x faster than medium level.
 
 ---
 

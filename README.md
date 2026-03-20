@@ -52,6 +52,18 @@ This is where MCMX makes its largest gains:
 | **MCMX (2+ threads)** | **Much faster** | **★★★★☆** |
 | Libbsc | Fastest | ★★★★☆ |
 
+Test run on TAR containing 150 MB of binaries
+
+| Compressor                | Size KB | RAM Peak | Compr. MS | Decomp. MS | VS Libbsc |
+|---------------------------|---------|----------|-----------|------------|---------------------------|
+| libbsc 3.3.12 -e2 -b200   | 13 782  | 505 MB   | 1473      | 1000       |                           |
+| MCM 0.83 -m7              | 10 837  | 558 MB   | 13500     | 13092      | -21.3%                    |
+| MCMX 0.85 -m7             | 10 837  | 559 MB   | 12000     | 13239      | -21.3%                    |
+| MCMX 0.85 -m7  -threads 2 | 10 907  | 832 MB   | **6750**      | **6928**       | -20.8%                    |
+| MCMX 0.85 -z7 -threads 2  | 11 895  | 690 MB   | **4570**      | **4854**       | -15.8%                    |
+
+
+
 At the fastest levels (`-z` / `-t`) with 2 or more threads, MCMX approaches libbsc in throughput while maintaining a higher compression ratio in many scenario, especialy on structured data.
 
 ---

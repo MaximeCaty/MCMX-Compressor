@@ -32,7 +32,7 @@ This is where MCMX makes its largest gains:
 |---|---|
 | **Block splitting** | Files are split into blocks and compressed / decompressed in parallel |
 | **Reduced RAM usage** | Parallel blocks consume less peak memory than monolithic compression |
-| **Shared dictionary** | Unlike BWT-based compressors, MCM's Mixed Context model tolerates threading with minimal ratio loss — the shared dictionary is preserved across threads to keep compression quality high |
+| **Shared dictionary** | Mixed Context model tolerates threading with minimal ratio loss using shared dictionary across threads. |
 
 > **Note on threading vs. ratio:** BWT compressors lose significant ratio when threaded because context is lost between blocks. MCM's Mixed Context approach is more resilient — making MCMX's multithreading genuinely effective rather than a trade-off.
 

@@ -23,6 +23,7 @@
 
 #include "Archive.hpp"
 #include <future>
+#include <sstream>
 #include <mutex>
 
 #include <algorithm>
@@ -1163,6 +1164,69 @@ uint64_t Archive::compress(const std::vector<FileInfo> &in_files)
 
   writeBlocks();
 
+  // Single-thread fast path: compress directly to stream_ like original 0.83.
+  // Avoids allocating the entire compressed block in RAM.
+  if (num_threads_ == 1)
+  {
+    uint64_t total = 0;
+    for (const auto &bptr : blocks_)
+    {
+      const SolidBlock *block = bptr.get();
+      const Dict::CodeWordSet *prebuilt =
+          (shared_text_dict && block->algorithm_.profile() == Detector::kProfileText)
+              ? shared_text_dict.get()
+              : nullptr;
+      FileSegmentStreamFileList segstream(
+          const_cast<std::vector<FileSegmentStream::FileSegments> *>(&block->segments_),
+          0, &files_, false, false);
+      Algorithm algo_copy = block->algorithm_;
+      std::unique_ptr<Filter> filter(algo_copy.createFilter(&segstream, &analyzer, *this, opt_var_, prebuilt));
+      Stream *in_stream = &segstream;
+      FrequencyCounter<256> freq;
+      if (filter != nullptr)
+      {
+        in_stream = filter.get();
+        freq = filter->GetFrequencies();
+      }
+      auto in_start = in_stream->tell();
+      std::unique_ptr<Compressor> comp(algo_copy.CreateCompressor(freq));
+      comp->setOpt(opt_var_);
+      comp->setOpts(opt_vars_);
+      // Write placeholder header
+      auto out_start = stream_->tell();
+      for (size_t i = 0; i < kSizePad; ++i)
+        stream_->put(0);
+      // Compress directly to stream_
+      const clock_t t0 = clock();
+      comp->compress(in_stream, stream_);
+      auto after_pos = stream_->tell();
+      const uint64_t filter_size = in_stream->tell() - in_start;
+      const uint64_t payload_len = after_pos - out_start - kSizePad;
+      const uint64_t uncomp_size = segstream.tell();
+      // Fix up header in place
+      stream_->seek(out_start);
+      auto write_u64le = [&](uint64_t v)
+      {
+        for (int i = 0; i < 8; ++i)
+        {
+          stream_->put(v & 0xFF);
+          v >>= 8;
+        }
+      };
+      write_u64le(filter_size);
+      write_u64le(payload_len);
+      stream_->seek(after_pos);
+      std::cout << "Compressed " << formatNumber(uncomp_size)
+                << " -> " << formatNumber(after_pos - out_start)
+                << " [" << Detector::profileToString(block->algorithm_.profile()) << "]"
+                << " in " << clockToSeconds(clock() - t0) << "s" << std::endl
+                << std::endl;
+      total += uncomp_size;
+    }
+    files_.clear();
+    return total;
+  }
+
   // Parallel compress + serial merge.
   // Each block compressed to in-memory buffer by a worker thread.
   // Results merged to stream_ in deterministic order.
@@ -1181,7 +1245,7 @@ uint64_t Archive::compress(const std::vector<FileInfo> &in_files)
     {
       BlockResult result;
       result.profile_name = Detector::profileToString(block->algorithm_.profile());
-      result.data.reserve(block->total_size_ + kSizePad);
+      result.data.reserve(block->total_size_ / 2 + kSizePad);
       WriteVectorStream wvs(&result.data);
       for (size_t i = 0; i < kSizePad; ++i)
         wvs.put(0);
@@ -1301,6 +1365,9 @@ uint64_t Archive::compress(const std::vector<FileInfo> &in_files)
 
     check(result.uncompressed_size == blocks_[next_merge]->total_size_);
     total += result.uncompressed_size;
+    {
+      std::vector<uint8_t>().swap(result.data);
+    } // free output buffer immediately
     ++next_merge;
   }
 
@@ -1376,6 +1443,7 @@ void Archive::decompress(const std::string &out_dir, bool verify)
     uint64_t uncompressed_size;
     std::string profile_name;
     const SolidBlock *block;
+    mutable std::string result_message; // filled by worker, printed by main thread
   };
   std::vector<BlockPayload> payloads;
   payloads.reserve(blocks_.size());
@@ -1442,9 +1510,12 @@ void Archive::decompress(const std::string &out_dir, bool verify)
       std::unique_lock<std::mutex> lock(diff_mutex);
       differences += verify_segstream.totalDifferences();
     }
-    std::cout << "Decompressed " << formatNumber(p.uncompressed_size)
-              << " [" << p.profile_name << "]"
-              << " in " << clockToSeconds(clock() - t0) << "s" << std::endl;
+    // Store message -- avoid cout lock contention between parallel threads
+    std::ostringstream oss;
+    oss << "Decompressed " << formatNumber(p.uncompressed_size)
+        << " [" << p.profile_name << "]"
+        << " in " << clockToSeconds(clock() - t0) << "s";
+    p.result_message = oss.str();
   };
 
   const size_t n_blocks = payloads.size();
@@ -1471,6 +1542,8 @@ void Archive::decompress(const std::string &out_dir, bool verify)
       std::cerr << "ERROR decompressing block " << dnext_join << ": " << e.what() << std::endl;
       throw;
     }
+    if (!payloads[dnext_join].result_message.empty())
+      std::cout << payloads[dnext_join].result_message << std::endl;
     if (dnext_launch < n_blocks)
     {
       dfutures[dnext_launch] = std::async(std::launch::async, decompressBlock,

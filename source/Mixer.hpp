@@ -67,7 +67,7 @@ public:
 };
 
 template <typename T, const uint32_t kWeights>
-class alignas(32) Mixer
+class Mixer
 {
 public:
   // Each mixer has its own set of weights.
@@ -430,7 +430,7 @@ private:
 };
 
 template <typename Mixer>
-class alignas(32) MixerArray
+class MixerArray
 {
   std::vector<Mixer> mixers_;
   Mixer *cur_mixers_;

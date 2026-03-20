@@ -4594,8 +4594,8 @@ namespace cm
   template <size_t kInputs, bool kUseSSE, typename HistoryType>
   inline void CM<kInputs, kUseSSE, HistoryType>::compress(Stream *in_stream, Stream *out_stream, uint64_t max_count)
   {
-    BufferedStreamWriter<4 * KB> sout(out_stream);
-    BufferedStreamReader<4 * KB> sin(in_stream);
+    BufferedStreamWriter<64 * KB> sout(out_stream);
+    BufferedStreamReader<64 * KB> sin(in_stream);
     assert(in_stream != nullptr);
     assert(out_stream != nullptr);
     Detector detector(in_stream);
@@ -4772,8 +4772,8 @@ namespace cm
   template <size_t kInputs, bool kUseSSE, typename HistoryType>
   inline void CM<kInputs, kUseSSE, HistoryType>::decompress(Stream *in_stream, Stream *out_stream, uint64_t max_count)
   {
-    BufferedStreamReader<4 * KB> sin(in_stream);
-    BufferedStreamWriter<4 * KB> sout(out_stream);
+    BufferedStreamReader<64 * KB> sin(in_stream);
+    BufferedStreamWriter<64 * KB> sout(out_stream);
     Detector detector(out_stream);
     if (!force_profile_)
     {

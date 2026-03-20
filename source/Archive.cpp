@@ -1,18 +1,18 @@
-/*	MCMX file compressor
+/*	MCM file compressor
 
   Copyright (C) 2014, Google Inc.
-  Authors: Mathieu Chartier, Maxime Caty
+  Authors: Mathieu Chartier
 
   LICENSE
 
-    This file is part of the MCMX file compressor.
+    This file is part of the MCM file compressor.
 
-    MCMX is free software: you can redistribute it and/or modify
+    MCM is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    MCMX is distributed in the hope that it will be useful,
+    MCM is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
@@ -1232,7 +1232,7 @@ uint64_t Archive::compress(const std::vector<FileInfo> &in_files)
             << num_threads_ << " thread(s)" << std::endl
             << std::endl;
 
-  // DEBUG: run synchronously on main thread to isolate threading vs code bug
+  // Pre-fill sliding window with async tasks.
   while (next_launch < num_blocks && next_launch < num_threads_)
   {
     const SolidBlock *block = blocks_[next_launch].get();
@@ -1240,17 +1240,7 @@ uint64_t Archive::compress(const std::vector<FileInfo> &in_files)
         (shared_text_dict && block->algorithm_.profile() == Detector::kProfileText)
             ? shared_text_dict.get()
             : nullptr;
-    std::cout << "Launching block " << next_launch
-              << " [" << Detector::profileToString(block->algorithm_.profile()) << "]"
-              << " size=" << formatNumber(block->total_size_) << std::endl
-              << std::flush;
-    auto sync_result = compressBlock(block, prebuilt);
-    // Store as ready future
-    std::promise<BlockResult> prom;
-    prom.set_value(std::move(sync_result));
-    futures[next_launch] = prom.get_future();
-    std::cout << "Block " << next_launch << " done synchronously." << std::endl
-              << std::flush;
+    futures[next_launch] = std::async(std::launch::async, compressBlock, block, prebuilt);
     ++next_launch;
   }
 

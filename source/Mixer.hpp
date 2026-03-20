@@ -178,7 +178,7 @@ public:
     // const int delta_round = (1 << shift) >> (prob_shift - delta);
     const int64_t err = base_learn * learn_mult;
     const bool ret = err < static_cast<int64_t>(-delta_round) || err > static_cast<int64_t>(delta_round);
-    if (ret)
+    if (ret) [[likely]]
     {
       UpdateRec<0>(p0, err, shift);
       UpdateRec<1>(p1, err, shift);
@@ -430,7 +430,7 @@ private:
 };
 
 template <typename Mixer>
-class MixerArray
+class alignas(32) MixerArray
 {
   std::vector<Mixer> mixers_;
   Mixer *cur_mixers_;

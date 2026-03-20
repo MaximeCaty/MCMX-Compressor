@@ -51,9 +51,9 @@ static void printHeader()
 {
   std::cout
       << "======================================================================" << std::endl
-      << "mcm compressor v" << Archive::Header::kCurMajorVersion << "." << Archive::Header::kCurMinorVersion
-      << ", by Mathieu Chartier (c)2016 Google Inc." << std::endl
-      << "Experimental, may contain bugs. Contact mathieu.a.chartier@gmail.com" << std::endl
+      << "MCMX compressor v" << Archive::Header::kCurMajorVersion << "." << Archive::Header::kCurMinorVersion
+      << ", by Maxime Caty" << std::endl
+      << "Fork of original MCM v0.84 with speed oriented improvments" << std::endl
       << "Special thanks to: Matt Mahoney, Stephan Busch, Christopher Mattern." << std::endl
       << "======================================================================" << std::endl;
 }
@@ -111,8 +111,7 @@ public:
         << "0 .. 11 specifies memory with 32mb .. 5gb per thread (default " << CompressionOptions::kDefaultMemUsage << ")" << std::endl
         << "10 and 11 are only supported on 64 bits" << std::endl
         << "-test tests the file after compression is done" << std::endl
-        // << "-b <mb> specifies block size in MB" << std::endl
-        // << "-t <threads> the number of threads to use (decompression requires the same number of threads" << std::endl
+        << "-threads <threads> the number of threads to use (default 1)" << std::endl
         << "Examples:" << std::endl
         << "Compress: " << name << " -m9 enwik8 enwik8.mcm" << std::endl
         << "Decompress: " << name << " d enwik8.mcm enwik8.ref" << std::endl;

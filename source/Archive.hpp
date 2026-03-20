@@ -87,7 +87,7 @@ public:
   {
   public:
     static const size_t kCurMajorVersion = 0;
-    static const size_t kCurMinorVersion = 84;
+    static const size_t kCurMinorVersion = 85;
     static const size_t kMagicStringLength = 10;
 
     static const char *getMagic()

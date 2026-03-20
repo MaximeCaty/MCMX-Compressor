@@ -1115,7 +1115,7 @@ namespace cm
       }
 
       uint32_t h = HashFunc((last_bytes_ & 0xFFFF) * 3, 0x4ec457c1 * 19);
-      if (mm_len == 0)
+      if (mm_len == 0) [[likely]]
       {
         ++miss_len_;
         if (kStatistics)

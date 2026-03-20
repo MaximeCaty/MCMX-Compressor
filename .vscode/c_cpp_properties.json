@@ -1,0 +1,21 @@
+{
+    "configurations": [
+        {
+            "name": "MinGW-AVX2",
+            "compilerPath": "C:/msys64/ucrt64/bin/g++.exe",
+            "compilerArgs": [
+                "-march=native",
+                "-mavx2"
+            ],
+            "cppStandard": "c++17",
+            "intelliSenseMode": "windows-gcc-x64",
+            "includePath": [
+                "${workspaceFolder}/source",
+                "C:/msys64/ucrt64/include/c++/15.1.0",
+                "C:/msys64/ucrt64/include",
+                "${workspaceFolder}/include"
+            ]
+        }
+    ],
+    "version": 4
+}

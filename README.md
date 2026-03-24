@@ -13,7 +13,7 @@ MCMX fixes that through a few improvements: modern compiler, faster level, and m
 ## What's New
 
 ### ⚙️ Compiler Optimisations
-- **Modern LTO compilation** — Link-Time Optimisation squeezes an additional **~5% speed** from the binary at no cost to compression.
+- **Modern LTO compilation** — squeezes **~5% speed** from the binary at no cost to compression.
 - **PGO (Profile-Guided Optimisation)** — Post-compile training on representative workloads yields a further **~6% speed** improvement by optimising real hot paths.
 
 ### 🗜️ New Compression Level: `-z`
@@ -57,9 +57,9 @@ Test run on TAR containing 150 MB of binaries
 |---------------------------|---------|----------|-----------|------------|---------------------------|
 | libbsc 3.3.12 -e2 -b200   | 13 782  | 505 MB   | 1473      | 1000       |                           |
 | MCM 0.84 -m7              | 10 837  | 558 MB   | 13500     | 13092      | -21.3%                    |
-| MCMX 0.85 -m7             | 10 837  | 559 MB   | 12000     | 13239      | -21.3%                    |
-| MCMX 0.85 -m7  -threads 2 | 10 907  | 832 MB   | **6750**      | **6928**       | -20.8%                    |
-| MCMX 0.85 -z7 -threads 2  | 11 895  | 690 MB   | **4570**      | **4854**       | -15.8%                    |
+| MCMX 0.85 -m7             | 10 837  | 559 MB   | 11800     | 13001      | -21.3%                    |
+| MCMX 0.85 -m7  -threads 2 | 10 907  | 832 MB   | 6440      | 6886       | -20.8%                    |
+| MCMX 0.85 -z7 -threads 2  | 11 895  | 690 MB   | **4380**      | **4685**       | -15.8%                    |
 
 Enwik8
 
@@ -67,9 +67,9 @@ Enwik8
 |---------------------------|---------|----------|-----------|------------|--------------|
 | libbsc 3.3.12 -e2 -b200   | 20300   | 488 MB   | 1531      | 938        |              |
 | MCM 0.84 -m7              | 17950   | 428 MB   | 18700     | 18541      | -11.5%       |
-| MCMX 0.85 -m7             | 17950   | 429 MB   | 19400     | 18832      | -11.5%       |
-| MCMX 0.85 -m7  -threads 2 | 18425   | 874 MB   | 11000     | 9680       | -9.2%        |
-| MCMX 0.85 -z7 -threads 2  | 18425   | 860 MB   | **7920**      | **9640**       | -9.2%        |
+| MCMX 0.85 -m7             | 17950   | 429 MB   | 19300     | 18181      | -11.5%       |
+| MCMX 0.85 -m7  -threads 2 | 18425   | 874 MB   | 10800     | 9755      | -9.2%        |
+| MCMX 0.85 -t7 -threads 2  | 19237   | 860 MB   | **8200**      | **7104**       | -5.2%        |
 
 At the fastest levels (`-z` / `-t`) with 2 or more threads, MCMX still beat libbsc in many scenarion while beeing 2-3x faster than medium level.
 

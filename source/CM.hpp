@@ -611,7 +611,7 @@ namespace cm
             p0 = 0,
             p1 = 0, p2 = 0, p3 = 0, p4 = 0, p5 = 0, p6 = 0, p7 = 0,
             p8 = 0, p9 = 0, p10 = 0, p11 = 0, p12 = 0, p13 = 0, p14 = 0, p15 = 0;
-        constexpr bool kUseAdd = false;
+        constexpr bool kUseAdd = true;
         auto ctx_xor = kUseAdd ? 0 : ctx;
         auto ht = kUseAdd ? hash_table_ + ctx : hash_table_;
         if (kBitType == kBitTypeLZP)
@@ -755,7 +755,7 @@ namespace cm
         }
         else if (true)
         {
-          p = (p * 1 + sse3_.p(stp + kMaxValue / 2, (last_bytes_ & 0xFF) * 256 + mixer_ctx) * 15) / 16;
+          p = (p * 1 + sse3_.p(stp + kMaxValue / 2, (interval_model_ & 0xFF) * 256 + mixer_ctx) * 15) / 16;
           p += p == 0;
           // mixer_p = p;
           sse3 = true;

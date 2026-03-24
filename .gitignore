@@ -12,3 +12,5 @@
 bin/mcm
 lib/libmcm.a
 build/*
+*.zip
+mcmx-v0.85.zip

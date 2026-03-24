@@ -56,7 +56,38 @@ void MemMap::resize(size_t bytes)
 #if USE_MALLOC
   storage = std::calloc(1, bytes);
 #elif WIN32
-  storage = (void *)VirtualAlloc(nullptr, size, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
+  // Try large pages first (eliminates TLB misses for 256MB+ hash tables).
+  // Requires SeLockMemoryPrivilege. Silently falls back to normal pages.
+  storage = nullptr;
+  {
+    HANDLE token;
+    if (OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &token))
+    {
+      TOKEN_PRIVILEGES tp = {};
+      tp.PrivilegeCount = 1;
+      tp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
+      if (LookupPrivilegeValueA(nullptr, "SeLockMemoryPrivilege", &tp.Privileges[0].Luid))
+      {
+        AdjustTokenPrivileges(token, FALSE, &tp, sizeof(tp), nullptr, nullptr);
+        if (GetLastError() == ERROR_SUCCESS)
+        {
+          SIZE_T large_page_min = GetLargePageMinimum();
+          if (large_page_min > 0)
+          {
+            // Round size up to multiple of large page size
+            SIZE_T aligned_size = (size + large_page_min - 1) & ~(large_page_min - 1);
+            storage = (void *)VirtualAlloc(nullptr, aligned_size,
+                                           MEM_RESERVE | MEM_COMMIT | MEM_LARGE_PAGES, PAGE_READWRITE);
+          }
+        }
+      }
+      CloseHandle(token);
+    }
+  }
+  if (!storage)
+  {
+    storage = (void *)VirtualAlloc(nullptr, size, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
+  }
 #else
 #error UNIMPLEMENTED
 #endif

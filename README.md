@@ -116,9 +116,9 @@ CMake : Delete Cache and Reconfigure
 Then CTRL + F5 to build the executable.
 
  For PGO compilation :
- - Build the trainer executbale with cmake ```--build build --target mcm_train -j4```
+ - Build the trainer executbale with ```cmake --build build --target mcm_train -j4```
  - Run compression with the trainer on multiple files eg ```build\mcmx_train.exe -z7 -threads 2 "C:\yourfile-sample" "C:\yourfile-sample.mcmx"```
- - Compile the PGO using trained data : ```cmake --build build --target mcm_pgo_train``` the gain is about 5-7% speed with reasonable training.
+ - Compile the PGO using trained data : ```cmake --build build --target mcm_pgo``` the gain is about 5-6% speed with reasonable training.
 
 
 ---

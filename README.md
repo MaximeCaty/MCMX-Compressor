@@ -6,9 +6,9 @@
 
 ## Why MCMX?
 
-MCM is a top tier compressor regarding speed/ratio. Its weakness has always been speed — making it impractical for many real-world workloads. 
+MCM is a top tier compressor regarding speed/ratio, beeing top 19 in Large text compression benchmark with reasonable speed : https://www.mattmahoney.net/dc/text.html
 
-MCMX fixes that through a few improvements: modern compiler, faster level, and multithreading.
+MCMX try to improve MCM speed while maintening excellent ratio, with few improvements and a new faster level.
 
 ## What's New
 
@@ -32,8 +32,9 @@ This is where MCMX makes its largest gains:
 |---|---|
 | **Block splitting** | Files are split into blocks and compressed / decompressed in parallel |
 | **Shared dictionary** | Mixed Context model tolerates threading with minimal ratio loss using shared dictionary across threads. |
+| **Model warm up** | When splitted, model warm up with previous block tail data to limit ratio loss. |
 
-> **Note on threading vs. ratio:** BWT compressors lose significant ratio when threaded because context is lost between blocks. MCM's Mixed Context approach is more resilient — making MCMX's multithreading genuinely effective rather than a trade-off.
+> **Note on threading vs. ratio:** BWT compressors lose significant ratio when threaded because context is lost between blocks. MCM's Mixed Context approach is more resilient — making MCMX's multithreading quite effective.
 
 ### Misc. Fixs
 
@@ -51,7 +52,7 @@ This is where MCMX makes its largest gains:
 | **MCMX (2+ threads)** | **Much faster** | **★★★★☆** |
 | Libbsc | Fastest | ★★★★☆ |
 
-Test run on TAR containing 150 MB of binaries
+TAR containing 150 MB of binaries
 
 | Compressor                | Size KB | RAM Peak | Compr. MS | Decomp. MS | VS Libbsc |
 |---------------------------|---------|----------|-----------|------------|---------------------------|
@@ -61,7 +62,7 @@ Test run on TAR containing 150 MB of binaries
 | MCMX 0.85 -m7  -threads 2 | 10 907  | 832 MB   | 6440      | 6886       | -20.8%                    |
 | MCMX 0.85 -z7 -threads 2  | 11 895  | 690 MB   | **4380**      | **4685**       | -15.8%                    |
 
-Enwik8
+Enwik8 (95 MB sparse text)
 
 | Compressor                | Size KB | RAM Peak | Compr. MS | Decomp. MS | VS Base line |
 |---------------------------|---------|----------|-----------|------------|--------------|
